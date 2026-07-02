@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Lexer requests and bugs
+    url: https://github.com/alecthomas/chroma/discussions/categories/-lexer-requests-and-bugs
+    about: Lexers are community maintained. Please discuss missing lexers and highlighting bugs here.

@@ -203,6 +203,10 @@ err := formatter.WriteCSS(w, style)
 
 ### Lexers
 
+Lexers are community maintained. Please use
+[Discussions](https://github.com/alecthomas/chroma/discussions/categories/-lexer-requests-and-bugs) for lexer
+requests and lexer highlighting bugs.
+
 See the [Pygments documentation](http://pygments.org/docs/lexerdevelopment/)
 for details on implementing lexers. Most concepts apply directly to Chroma,
 but see existing lexer implementations for real examples.

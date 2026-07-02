@@ -1,0 +1,38 @@
+title: "[Lexer] "
+labels: ["help wanted", "lexer missing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Lexers are community maintained. The best way to get a lexer added or fixed is to contribute the change.
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request type
+      options:
+        - Missing lexer
+        - Lexer highlighting bug
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Name of the language, format, or dialect.
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Sample input
+      description: Provide a small, complete sample that demonstrates the missing or incorrect highlighting.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Syntax references
+      description: Link to existing syntax definitions, specifications, or representative examples.
+    validations:
+      required: true

@@ -1,8 +1,12 @@
 name: 🐞 Bug
-description: File a bug/issue
+description: Report a Chroma code bug
 title: "<title>"
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are for Chroma code bugs only. Lexers are community maintained; please use [Discussions](https://github.com/alecthomas/chroma/discussions/categories/-lexer-requests-and-bugs) for missing lexers and lexer highlighting bugs.
   - type: checkboxes
     attributes:
       label: Is there an existing issue for this?

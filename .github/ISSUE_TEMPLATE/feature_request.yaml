@@ -22,6 +22,6 @@ body:
       label: What feature do you propose?
       description: |
         The feature should describe a change to Chroma's code, not lexers.
-        For lexers, fill out the "Lexer request" form.
+        Lexers are community maintained; please use [Discussions](https://github.com/alecthomas/chroma/discussions/categories/-lexer-requests-and-bugs) for lexer requests and bugs.
     validations:
       required: true
