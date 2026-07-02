@@ -3,3 +3,6 @@ contact_links:
   - name: Lexer requests and bugs
     url: https://github.com/alecthomas/chroma/discussions/categories/-lexer-requests-and-bugs
     about: Lexers are community maintained. Please discuss missing lexers and highlighting bugs here.
+  - name: Theme requests and bugs
+    url: https://github.com/alecthomas/chroma/discussions/categories/-theme-bugs-and-requests
+    about: Themes are community maintained. Please discuss missing themes and theme bugs here.
