@@ -8,6 +8,25 @@ import (
 	"github.com/alecthomas/chroma/v3"
 )
 
+func TestTTYTableEntriesAreDistinct(t *testing.T) {
+	// The 256-colour palette has only 247 distinct RGB values; see the
+	// comment on ttyTables. A count below these values means an entry has
+	// been dropped or shadowed by a duplicate key.
+	tests := []struct {
+		colours  int
+		expected int
+	}{
+		{8, 16},
+		{16, 16},
+		{256, 247},
+	}
+	for _, test := range tests {
+		table := ttyTables[test.colours]
+		assert.Equal(t, test.expected, len(table.foreground))
+		assert.Equal(t, test.expected, len(table.background))
+	}
+}
+
 func TestClosestColour(t *testing.T) {
 	actual := findClosest(ttyTables[256], chroma.MustParseColour("#e06c75"))
 	assert.Equal(t, chroma.MustParseColour("#d75f87"), actual)
