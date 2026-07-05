@@ -3,7 +3,8 @@ package styles
 import (
 	"embed"
 	"io/fs"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 
 	"github.com/alecthomas/chroma/v3"
@@ -47,12 +48,7 @@ func Register(style *chroma.Style) *chroma.Style {
 
 // Names of all available styles.
 func Names() []string {
-	out := []string{}
-	for name := range registry {
-		out = append(out, name)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(registry))
 }
 
 // Lookup a named style, returning false if not found.

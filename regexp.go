@@ -1,6 +1,7 @@
 package chroma
 
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"iter"
@@ -9,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -27,8 +27,8 @@ type Rule struct {
 
 // Words creates a regex that matches any of the given literal words.
 func Words(prefix, suffix string, words ...string) string {
-	sort.Slice(words, func(i, j int) bool {
-		return len(words[j]) < len(words[i])
+	slices.SortFunc(words, func(a, b string) int {
+		return cmp.Compare(len(b), len(a))
 	})
 	for i, word := range words {
 		words[i] = regexp.QuoteMeta(word)

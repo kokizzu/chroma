@@ -2,7 +2,7 @@ package chroma
 
 import (
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -44,7 +44,7 @@ func (l *LexerRegistry) Names(withAliases bool) []string {
 			out = append(out, config.Aliases...)
 		}
 	}
-	sort.Strings(out)
+	slices.Sort(out)
 	return out
 }
 
@@ -62,7 +62,7 @@ func (l *LexerRegistry) Aliases(skipWithoutAliases bool) []string {
 		}
 		out = append(out, config.Aliases...)
 	}
-	sort.Strings(out)
+	slices.Sort(out)
 	return out
 }
 
@@ -93,8 +93,7 @@ func (l *LexerRegistry) Get(name string) Lexer {
 	if len(candidates) == 0 {
 		return nil
 	}
-	sort.Sort(candidates)
-	return candidates[0]
+	return slices.MinFunc(candidates, compareLexersByPriority)
 }
 
 // MatchMimeType attempts to find a lexer for the given MIME type.
@@ -108,8 +107,7 @@ func (l *LexerRegistry) MatchMimeType(mimeType string) Lexer {
 		}
 	}
 	if len(matched) != 0 {
-		sort.Sort(matched)
-		return matched[0]
+		return slices.MinFunc(matched, compareLexersByPriority)
 	}
 	return nil
 }
@@ -143,8 +141,7 @@ func (l *LexerRegistry) Match(filename string) Lexer {
 		}
 	}
 	if len(matched) > 0 {
-		sort.Sort(matched)
-		return matched[0]
+		return slices.MinFunc(matched, compareLexersByPriority)
 	}
 	matched = nil
 	// Next, try filename aliases.
@@ -170,8 +167,7 @@ func (l *LexerRegistry) Match(filename string) Lexer {
 		}
 	}
 	if len(matched) > 0 {
-		sort.Sort(matched)
-		return matched[0]
+		return slices.MinFunc(matched, compareLexersByPriority)
 	}
 	return nil
 }

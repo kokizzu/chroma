@@ -1,12 +1,13 @@
 package html
 
 import (
+	"cmp"
 	"fmt"
 	"html"
 	"io"
 	"iter"
+	"maps"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -127,7 +128,7 @@ func WithLinkableLineNumbers(b bool, prefix string) Option {
 func HighlightLines(ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.highlightRanges = ranges
-		sort.Sort(f.highlightRanges)
+		f.highlightRanges.sort()
 	}
 }
 
@@ -138,7 +139,7 @@ func WithLinePrompts(prompt string, ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.linePrompt = prompt
 		f.linePromptRanges = ranges
-		sort.Sort(f.linePromptRanges)
+		f.linePromptRanges.sort()
 	}
 }
 
@@ -238,9 +239,9 @@ type Formatter struct {
 
 type lineRanges [][2]int
 
-func (r lineRanges) Len() int           { return len(r) }
-func (r lineRanges) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
-func (r lineRanges) Less(i, j int) bool { return r[i][0] < r[j][0] }
+func (r lineRanges) sort() {
+	slices.SortFunc(r, func(a, b [2]int) int { return cmp.Compare(a[0], b[0]) })
+}
 
 func (r lineRanges) match(rangeIndex, line int) (bool, int) {
 	for rangeIndex < len(r) && line > r[rangeIndex][1] {
@@ -525,13 +526,7 @@ func (f *Formatter) WriteCSS(w io.Writer, style *chroma.Style) error {
 			}
 		}
 	}
-	tts := []int{}
-	for tt := range css {
-		tts = append(tts, int(tt))
-	}
-	sort.Ints(tts)
-	for _, ti := range tts {
-		tt := chroma.TokenType(ti)
+	for _, tt := range slices.Sorted(maps.Keys(css)) {
 		switch tt {
 		case chroma.Background, chroma.PreWrapper:
 			continue

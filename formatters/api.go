@@ -3,7 +3,8 @@ package formatters
 import (
 	"io"
 	"iter"
-	"sort"
+	"maps"
+	"slices"
 
 	"github.com/alecthomas/chroma/v3"
 	"github.com/alecthomas/chroma/v3/formatters/html"
@@ -32,12 +33,7 @@ var registry = map[string]chroma.Formatter{}
 
 // Names of registered formatters.
 func Names() []string {
-	out := []string{}
-	for name := range registry {
-		out = append(out, name)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(registry))
 }
 
 // Get formatter by name.

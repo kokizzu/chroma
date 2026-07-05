@@ -1,6 +1,7 @@
 package chroma
 
 import (
+	"cmp"
 	"fmt"
 	"iter"
 	"strings"
@@ -160,15 +161,21 @@ type PrioritisedLexers []Lexer
 func (l PrioritisedLexers) Len() int      { return len(l) }
 func (l PrioritisedLexers) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
 func (l PrioritisedLexers) Less(i, j int) bool {
-	ip := l[i].Config().Priority
-	if ip == 0 {
-		ip = 1
+	return compareLexersByPriority(l[i], l[j]) < 0
+}
+
+// compareLexersByPriority orders lexers by descending priority, treating an
+// unset priority as 1.
+func compareLexersByPriority(a, b Lexer) int {
+	ap := a.Config().Priority
+	if ap == 0 {
+		ap = 1
 	}
-	jp := l[j].Config().Priority
-	if jp == 0 {
-		jp = 1
+	bp := b.Config().Priority
+	if bp == 0 {
+		bp = 1
 	}
-	return ip > jp
+	return cmp.Compare(bp, ap)
 }
 
 // Analyser determines how appropriate this lexer is for the given text.
