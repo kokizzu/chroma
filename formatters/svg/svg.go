@@ -157,21 +157,22 @@ const (
 	TRUETYPE
 )
 
-var fontFormats = [...]string{
-	"woff",
-	"woff2",
-	"truetype",
+// The CSS format() hint differs from the MIME type for TrueType.
+var fontFormats = [...]struct{ mime, format string }{
+	{"font/woff", "woff"},
+	{"font/woff2", "woff2"},
+	{"font/ttf", "truetype"},
 }
 
 func (f *Formatter) writeFontStyle(w io.Writer) {
 	fmt.Fprintf(w, `<style>
 @font-face {
 	font-family: '%s';
-	src: url(data:application/x-font-%s;charset=utf-8;base64,%s) format('%s');'
+	src: url(data:%s;charset=utf-8;base64,%s) format('%s');
 	font-weight: normal;
 	font-style: normal;
 }
-</style>`, f.fontFamily, fontFormats[f.fontFormat], f.embeddedFont, fontFormats[f.fontFormat])
+</style>`, f.fontFamily, fontFormats[f.fontFormat].mime, f.embeddedFont, fontFormats[f.fontFormat].format)
 }
 
 func (f *Formatter) styleAttr(styles map[chroma.TokenType]string, tt chroma.TokenType) string {
