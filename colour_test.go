@@ -1,7 +1,6 @@
 package chroma
 
 import (
-	"math"
 	"testing"
 
 	assert "github.com/alecthomas/assert/v2"
@@ -48,16 +47,16 @@ func hue(c Colour) float64 {
 	g := float64(c.Green()) / 255
 	b := float64(c.Blue()) / 255
 
-	min := math.Min(math.Min(r, g), b)
-	max := math.Max(math.Max(r, g), b)
+	lo := min(r, g, b)
+	hi := max(r, g, b)
 
 	switch {
-	case r == min:
-		return (g - b) / (max - min)
-	case g == min:
-		return 2 + (b-r)/(max-min)
+	case r == lo:
+		return (g - b) / (hi - lo)
+	case g == lo:
+		return 2 + (b-r)/(hi-lo)
 	default:
-		return 4 + (r-g)/(max-min)
+		return 4 + (r-g)/(hi-lo)
 	}
 }
 

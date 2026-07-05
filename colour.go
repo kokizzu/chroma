@@ -101,17 +101,17 @@ func (c Colour) BrightenOrDarken(factor float64) Colour {
 }
 
 // ClampBrightness returns a copy of this colour with its brightness adjusted such that
-// it falls within the range [min, max] (or very close to it due to rounding errors).
+// it falls within the range [low, high] (or very close to it due to rounding errors).
 // The supplied values use the same [0.0, 1.0] range as Brightness.
-func (c Colour) ClampBrightness(min, max float64) Colour {
+func (c Colour) ClampBrightness(low, high float64) Colour {
 	if !c.IsSet() {
 		return c
 	}
 
-	min = math.Max(min, 0)
-	max = math.Min(max, 1)
+	low = max(low, 0)
+	high = min(high, 1)
 	current := c.Brightness()
-	target := math.Min(math.Max(current, min), max)
+	target := min(max(current, low), high)
 	if current == target {
 		return c
 	}
