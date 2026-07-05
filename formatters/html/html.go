@@ -1,13 +1,13 @@
 package html
 
 import (
-	"cmp"
 	"fmt"
 	"html"
 	"io"
 	"iter"
 	"maps"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -128,7 +128,7 @@ func WithLinkableLineNumbers(b bool, prefix string) Option {
 func HighlightLines(ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.highlightRanges = ranges
-		f.highlightRanges.sort()
+		sort.Sort(f.highlightRanges)
 	}
 }
 
@@ -139,7 +139,7 @@ func WithLinePrompts(prompt string, ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.linePrompt = prompt
 		f.linePromptRanges = ranges
-		f.linePromptRanges.sort()
+		sort.Sort(f.linePromptRanges)
 	}
 }
 
@@ -239,9 +239,9 @@ type Formatter struct {
 
 type lineRanges [][2]int
 
-func (r lineRanges) sort() {
-	slices.SortFunc(r, func(a, b [2]int) int { return cmp.Compare(a[0], b[0]) })
-}
+func (r lineRanges) Len() int           { return len(r) }
+func (r lineRanges) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
+func (r lineRanges) Less(i, j int) bool { return r[i][0] < r[j][0] }
 
 func (r lineRanges) match(rangeIndex, line int) (bool, int) {
 	for rangeIndex < len(r) && line > r[rangeIndex][1] {
