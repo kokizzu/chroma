@@ -10,11 +10,10 @@ tokentype = go.generate {
   outputs = ["tokentype_enumer.go"]
 }
 
-# Regenerate the lexer table in README.md by invoking the host `chroma` binary.
-# GOOS/GOARCH are cleared so cross-compile env vars don't break the local run.
+# Regenerate the supported-languages table in README.md.
 protected readme = exec {
-  command = "./table.py"
-  inputs = ["table.py", "lexers/**/*.go", "lexers/**/*.xml"]
+  command = "go -C cmd/chroma run . --list | _tools/format_supported_langs.py --update README.md"
+  inputs = ["_tools/format_supported_langs.py", "lexers/**/*.go", "lexers/**/*.xml"]
   output = "README.md"
 }
 

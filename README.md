@@ -37,6 +37,7 @@ translators for Pygments lexers and styles.
 
 ## Supported languages
 
+<!-- supported-languages:begin -->
 | Prefix | Language
 | :----: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 |   A    | ABAP, ABNF, ActionScript, ActionScript 3, Ada, Agda, AL, Alloy, AMPL, Angular2, ANTLR, ApacheConf, APL, AppleScript, ArangoDB AQL, Arduino, ArmAsm, Arturo, Astro, ATL, AutoHotkey, AutoIt, Awk
@@ -45,10 +46,10 @@ translators for Pygments lexers and styles.
 |   D    | D, Dart, Dax, Desktop file, Devicetree, Diff, Django/Jinja, dns, Docker, DTD, Dylan
 |   E    | EBNF, Elixir, Elm, EmacsLisp, ERB, Erlang
 |   F    | Factor, Fennel, Fish, Forth, Fortran, FortranFixed, FSharp
-|   G    | GAS, GDScript, GDScript3, Gemtext, Genshi, Genshi HTML, Genshi Text, Gettext, Gherkin, Gleam, GLSL, Gnuplot, Go, Go HTML Template, Go Template, Go Text Template, GraphQL, Groff, Groovy
-|   H    | Handlebars, Hare, Haskell, Haxe, HCL, Hexdump, HLB, HLSL, HolyC, HTML, HTTP, Hurl, Hy
+|   G    | GAS, GDScript, GDScript3, Gemfile.lock, Gemtext, Genshi, Genshi HTML, Genshi Text, Gettext, Gherkin, Gleam, GLSL, Gnuplot, Go, Go HTML Template, Go Template, Go Text Template, GraphQL, Groff, Groovy
+|   H    | Handlebars, Hare, Haskell, Haxe, Hexdump, HLB, HLSL, HolyC, HTML, HTTP, Hurl, Hy, Hyprlang
 |   I    | Idris, Igor, INI, Io, ISCdhcpd
-|   J    | J, Janet, Java, JavaScript, JSON, JSONata, JQ, Jsonnet, Julia, Jungle
+|   J    | J, Janet, Java, JavaScript, JQ, JSON, JSONata, Jsonnet, Julia, Jungle
 |   K    | Kakoune, KDL, Kotlin
 |   L    | Lateralus, Lean4, Lighttpd configuration file, LilyPond, LLVM, lox, Lua, Luau
 |   M    | Makefile, Mako, markdown, Markless, Mason, Materialize SQL dialect, Mathematica, Matlab, MCFunction, Meson, Metal, microcad, MiniZinc, MLIR, Modelica, Modula-2, Mojo, MonkeyC, MoonBit, MoonScript, MorrowindScript, Myghty, MySQL
@@ -58,13 +59,14 @@ translators for Pygments lexers and styles.
 |   Q    | QBasic, QML
 |   R    | R, Racket, Ragel, Raku, react, ReasonML, reg, Rego, reStructuredText, Rexx, RGBDS Assembly, Ring, RPGLE, RPMSpec, Ruby, Rust
 |   S    | SAS, Sass, Scala, scdoc, Scheme, Scilab, SCSS, Sed, Sieve, Smali, Smalltalk, Smarty, SNBT, Snobol, Solidity, SourcePawn, Spade, SPARQL, SQL, SquidConf, Standard ML, stas, Stylus, Svelte, Swift, SYSTEMD, systemverilog
-|   T    | TableGen, Tal, TASM, Tcl, Tcsh, Termcap, Terminfo, Terraform, TeX, Thrift, TOML, TradingView, Transact-SQL, Turing, Turtle, Twig, TypeScript, TypoScript, TypoScriptCssData, TypoScriptHtmlData, Typst
+|   T    | TableGen, Tal, TASM, Tcl, Tcsh, Templ, Termcap, Terminfo, Terraform, TeX, Thrift, TOML, TradingView, Transact-SQL, Turing, Turtle, Twig, TypeScript, TypoScript, TypoScriptCssData, TypoScriptHtmlData, Typst
 |   U    | ucode
 |   V    | V, V shell, Vala, VB.net, verilog, VHDL, VHS, VimL, vue
 |   W    | WDTE, WebAssembly Text Format, WebGPU Shading Language, WebVTT, Whiley
 |   X    | XML, Xorg
-|   Y    | YAML, YANG
+|   Y    | YAML, YAML+Jinja, YANG
 |   Z    | Z80 Assembly, Zed, Zig
+<!-- supported-languages:end -->
 
 _I will attempt to keep this section up to date, but an authoritative list can be
 displayed with `chroma --list`._

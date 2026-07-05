@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
+import argparse
 import re
 import sys
 from collections import defaultdict
+
+BEGIN_MARKER = "<!-- supported-languages:begin -->"
+END_MARKER = "<!-- supported-languages:end -->"
 
 
 def parse_lexers(lines: list[str]) -> list[str]:
@@ -60,21 +64,45 @@ def emit_markdown(groups: dict[str, list[str]]) -> str:
 	return "\n".join(markdown)
 
 
+def update_file(path: str, markdown: str) -> None:
+	"""Replace the table between the supported-languages markers in path"""
+	with open(path) as f:
+		content: str = f.read()
+	try:
+		begin: int = content.index(BEGIN_MARKER) + len(BEGIN_MARKER)
+		end: int = content.index(END_MARKER)
+	except ValueError:
+		sys.exit(f"{path}: missing {BEGIN_MARKER} / {END_MARKER} markers")
+	with open(path, "w") as f:
+		f.write(content[:begin] + "\n" + markdown + "\n" + content[end:])
+
+
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser(
+		description="Parse chroma --list piped from stdin and emit a markdown table for the README"
+	)
+	parser.add_argument(
+		"--update",
+		metavar="FILE",
+		help="replace the table between the supported-languages markers in FILE instead of printing it",
+	)
+	args = parser.parse_args()
+
 	if sys.stdin.isatty():
+		parser.print_help()
+		print("\nRecommended usage (from repo root):")
 		print(
-			"This script parses chroma --list piped from stdin and emits a markdown table for the README"
-		)
-		print("Recommended usage (from repo root):")
-		print(
-			"env -C cmd/chroma go run . --list | uv run _tools/format_supported_langs.py"
+			"go -C cmd/chroma run . --list | _tools/format_supported_langs.py --update README.md"
 		)
 		exit(1)
 
 	lines: list[str] | None = sys.stdin.readlines()
-	if lines:
-		lexers: list[str] = parse_lexers(lines)
-		groups: dict[str, list[str]] = group_by_prefix(lexers)
-		print(emit_markdown(groups))
-	else:
+	if not lines:
 		exit(1)
+	lexers: list[str] = parse_lexers(lines)
+	groups: dict[str, list[str]] = group_by_prefix(lexers)
+	markdown: str = emit_markdown(groups)
+	if args.update:
+		update_file(args.update, markdown)
+	else:
+		print(markdown)

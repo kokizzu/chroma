@@ -8,10 +8,10 @@ export GOARCH := env("GOARCH", "amd64")
 _help:
     @just -l
 
-# Generate README.md from lexer definitions
+# Regenerate the supported-languages table in README.md
 readme:
     #!/usr/bin/env bash
-    GOOS= GOARCH= ./table.py
+    GOOS= GOARCH= go -C cmd/chroma run . --list | _tools/format_supported_langs.py --update README.md
 
 # Generate tokentype_string.go
 tokentype-string:
