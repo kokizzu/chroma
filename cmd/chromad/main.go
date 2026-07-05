@@ -178,9 +178,6 @@ func newContext(r *http.Request) context {
 			Counterpart: s.Counterpart,
 		})
 	}
-	sort.Slice(ctx.Styles, func(i, j int) bool {
-		return ctx.Styles[i].Name < ctx.Styles[j].Name
-	})
 	return ctx
 }
 
