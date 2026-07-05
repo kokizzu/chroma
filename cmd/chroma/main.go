@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"iter"
 	"os"
 	"os/signal"
@@ -89,7 +88,7 @@ func (n *nopFlushableWriter) Flush() error { return nil }
 
 // prepareLenient prepares contents and lexer for input, using fallback lexer if no specific one is available for it.
 func prepareLenient(r io.Reader, filename string) (string, chroma.Lexer, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return "", nil, err
 	}
