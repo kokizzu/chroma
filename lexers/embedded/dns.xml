@@ -6,6 +6,9 @@
     <alias>bind</alias>
     <filename>*.zone</filename>
     <mime_type>text/dns</mime_type>
+    <analyse first="true">
+      <regex pattern="(?m)^@\s+IN\s+SOA\s+" score="1.0"/>
+    </analyse>
   </config>
   <rules>
     <state name="root">
