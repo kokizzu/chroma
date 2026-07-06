@@ -230,6 +230,16 @@ func main() {
 	if len(cli.Files) == 0 {
 		var contents string
 		var lexer chroma.Lexer
+		if cli.Check {
+			contents, lexer, err = prepareLenient(os.Stdin, cli.Filename)
+			ctx.FatalIfErrorf(err)
+			name := cli.Filename
+			if name == "" {
+				name = "-"
+			}
+			check(name, lex(ctx, lexer, contents))
+			return
+		}
 		if cli.Fail {
 			contents, lexer = prepareSpecific(ctx, os.Stdin, cli.Filename, 1024, -1)
 		} else {
