@@ -221,6 +221,12 @@ const (
 )
 
 var (
+	// StandardTypes maps token types to their short CSS class names.
+	//
+	// Token types deliberately absent from this map (e.g. NameKeyword,
+	// LiteralStringAtom) inherit the class of their sub-category or
+	// category via Lookup; formatters should resolve classes through that
+	// fallback rather than expecting an entry for every TokenType.
 	StandardTypes = map[TokenType]string{
 		Background:       "bg",
 		PreWrapper:       "chroma",
