@@ -38,7 +38,13 @@ var registry = func() map[string]*chroma.Style {
 }()
 
 // Fallback style. Reassign to change the default fallback style.
-var Fallback = registry["swapoff"]
+var Fallback = func() *chroma.Style {
+	fallback := registry["swapoff"]
+	if fallback == nil {
+		panic(`chroma/styles: default fallback style "swapoff" is missing`)
+	}
+	return fallback
+}()
 
 // Register a chroma.Style.
 //
