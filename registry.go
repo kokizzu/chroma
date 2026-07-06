@@ -117,59 +117,51 @@ func (l *LexerRegistry) MatchMimeType(mimeType string) Lexer {
 // Note that this iterates over all file patterns in all lexers, so is not fast.
 func (l *LexerRegistry) Match(filename string) Lexer {
 	filename = filepath.Base(filename)
-	matched := PrioritisedLexers{}
 	// First, try primary filename matches.
+	matched := PrioritisedLexers{}
 	for _, lexer := range l.Lexers {
-		config := lexer.Config()
-		for _, glob := range config.Filenames {
-			ok, err := filepath.Match(glob, filename)
-			if err != nil { // nolint
-				panic(err)
-			} else if ok {
-				matched = append(matched, lexer)
-			} else {
-				for _, suf := range &ignoredSuffixes {
-					ok, err := filepath.Match(glob+suf, filename)
-					if err != nil {
-						panic(err)
-					} else if ok {
-						matched = append(matched, lexer)
-						break
-					}
-				}
-			}
+		if matchGlobs(lexer.Config().Filenames, filename) {
+			matched = append(matched, lexer)
 		}
 	}
 	if len(matched) > 0 {
 		return slices.MinFunc(matched, compareLexersByPriority)
 	}
-	matched = nil
 	// Next, try filename aliases.
+	matched = nil
 	for _, lexer := range l.Lexers {
-		config := lexer.Config()
-		for _, glob := range config.AliasFilenames {
-			ok, err := filepath.Match(glob, filename)
-			if err != nil { // nolint
-				panic(err)
-			} else if ok {
-				matched = append(matched, lexer)
-			} else {
-				for _, suf := range &ignoredSuffixes {
-					ok, err := filepath.Match(glob+suf, filename)
-					if err != nil {
-						panic(err)
-					} else if ok {
-						matched = append(matched, lexer)
-						break
-					}
-				}
-			}
+		if matchGlobs(lexer.Config().AliasFilenames, filename) {
+			matched = append(matched, lexer)
 		}
 	}
 	if len(matched) > 0 {
 		return slices.MinFunc(matched, compareLexersByPriority)
 	}
 	return nil
+}
+
+// matchGlobs reports whether filename matches any of globs, either directly
+// or with one of the ignoredSuffixes appended.
+func matchGlobs(globs []string, filename string) bool {
+	for _, glob := range globs {
+		ok, err := filepath.Match(glob, filename)
+		if err != nil { // nolint
+			panic(err)
+		}
+		if ok {
+			return true
+		}
+		for _, suf := range &ignoredSuffixes {
+			ok, err := filepath.Match(glob+suf, filename)
+			if err != nil {
+				panic(err)
+			}
+			if ok {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Analyse text content and return the "best" lexer..
