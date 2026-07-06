@@ -157,17 +157,16 @@ func (u *usingByGroup) Emit(groups []string, state *LexerState) iter.Seq[Token] 
 	// grab sublexer
 	sublexer := state.Registry.Get(groups[u.SublexerNameGroup])
 
-	// build iterators
-	iterators := make([]iter.Seq[Token], len(groups)-1)
+	iterators := make([]iter.Seq[Token], 0, len(groups)-1)
 	for i, group := range groups[1:] {
 		if i == u.CodeGroup-1 && sublexer != nil {
-			var err error
-			iterators[i], err = sublexer.Tokenise(nil, groups[u.CodeGroup])
+			it, err := sublexer.Tokenise(nil, groups[u.CodeGroup])
 			if err != nil {
 				panic(err)
 			}
+			iterators = append(iterators, it)
 		} else if u.Emitters[i] != nil {
-			iterators[i] = u.Emitters[i].Emit([]string{group}, state)
+			iterators = append(iterators, u.Emitters[i].Emit([]string{group}, state))
 		}
 	}
 	return Concaterator(iterators...)
