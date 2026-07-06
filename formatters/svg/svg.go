@@ -104,7 +104,7 @@ func (f *Formatter) writeSVG(w io.Writer, style *chroma.Style, tokens []chroma.T
 
 		for _, token := range tokens {
 			text := escapeString(token.String())
-			attr := f.styleAttr(svgStyles, token.Type)
+			attr, _ := chroma.Lookup(svgStyles, token.Type)
 			if attr != "" {
 				text = fmt.Sprintf("<tspan %s>%s</tspan>", attr, text)
 			}
@@ -173,19 +173,6 @@ func (f *Formatter) writeFontStyle(w io.Writer) {
 	font-style: normal;
 }
 </style>`, f.fontFamily, fontFormats[f.fontFormat].mime, f.embeddedFont, fontFormats[f.fontFormat].format)
-}
-
-func (f *Formatter) styleAttr(styles map[chroma.TokenType]string, tt chroma.TokenType) string {
-	if _, ok := styles[tt]; !ok {
-		tt = tt.SubCategory()
-		if _, ok := styles[tt]; !ok {
-			tt = tt.Category()
-			if _, ok := styles[tt]; !ok {
-				return ""
-			}
-		}
-	}
-	return styles[tt]
 }
 
 func (f *Formatter) styleToSVG(style *chroma.Style) map[chroma.TokenType]string {

@@ -334,6 +334,18 @@ func (t TokenType) Parent() TokenType {
 	return 0
 }
 
+// Lookup returns the value in values for t, falling back through t's parents
+// (sub-category, then category) until a match is found.
+func Lookup[V any](values map[TokenType]V, t TokenType) (V, bool) {
+	for ; t != 0; t = t.Parent() {
+		if v, ok := values[t]; ok {
+			return v, true
+		}
+	}
+	var zero V
+	return zero, false
+}
+
 func (t TokenType) Category() TokenType {
 	return t / 1000 * 1000
 }

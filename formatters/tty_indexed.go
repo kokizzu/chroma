@@ -242,22 +242,12 @@ type indexedTTYFormatter struct {
 func (c *indexedTTYFormatter) Format(w io.Writer, style *chroma.Style, it iter.Seq[chroma.Token]) (err error) {
 	theme := styleToEscapeSequence(c.table, style)
 	for token := range it {
-		clr, ok := theme[token.Type]
-
-		// This search mimics how styles.Get() is used in tty_truecolour.go.
+		clr, ok := chroma.Lookup(theme, token.Type)
 		if !ok {
-			clr, ok = theme[token.Type.SubCategory()]
-			if !ok {
-				clr, ok = theme[token.Type.Category()]
-				if !ok {
-					clr, ok = theme[chroma.Text]
-					if !ok {
-						clr = theme[chroma.Background]
-					}
-				}
+			if clr, ok = theme[chroma.Text]; !ok {
+				clr = theme[chroma.Background]
 			}
 		}
-
 		writeToken(w, clr, token.Value)
 	}
 	return nil

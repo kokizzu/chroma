@@ -422,16 +422,11 @@ func (f *Formatter) styleAttr(styles map[chroma.TokenType]string, tt chroma.Toke
 		}
 		return fmt.Sprintf(` class="%s"`, cls)
 	}
-	if _, ok := styles[tt]; !ok {
-		tt = tt.SubCategory()
-		if _, ok := styles[tt]; !ok {
-			tt = tt.Category()
-			if _, ok := styles[tt]; !ok {
-				return ""
-			}
-		}
+	style, ok := chroma.Lookup(styles, tt)
+	if !ok {
+		return ""
 	}
-	css := []string{styles[tt]}
+	css := []string{style}
 	css = append(css, extraCSS...)
 	return fmt.Sprintf(` style="%s"`, strings.Join(css, ";"))
 }
