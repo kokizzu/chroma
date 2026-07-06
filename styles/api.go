@@ -41,6 +41,9 @@ var registry = func() map[string]*chroma.Style {
 var Fallback = registry["swapoff"]
 
 // Register a chroma.Style.
+//
+// Not safe to call concurrently with other functions in this package;
+// register all styles at init time.
 func Register(style *chroma.Style) *chroma.Style {
 	registry[strings.ToLower(style.Name)] = style
 	return style

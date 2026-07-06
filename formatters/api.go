@@ -47,6 +47,9 @@ func Get(name string) chroma.Formatter {
 }
 
 // Register a named formatter.
+//
+// Not safe to call concurrently with other functions in this package;
+// register all formatters at init time.
 func Register(name string, formatter chroma.Formatter) chroma.Formatter {
 	registry[name] = formatter
 	return formatter

@@ -20,6 +20,9 @@ var (
 )
 
 // LexerRegistry is a registry of Lexers.
+//
+// Registration is not synchronised: register all lexers (typically at init
+// time) before using the registry concurrently.
 type LexerRegistry struct {
 	Lexers  Lexers
 	byName  map[string]Lexer
@@ -180,6 +183,8 @@ func (l *LexerRegistry) Analyse(text string) Lexer {
 
 // Register a Lexer with the LexerRegistry. If the lexer is already registered
 // it will be replaced.
+//
+// Not safe to call concurrently with any other method on the registry.
 func (l *LexerRegistry) Register(lexer Lexer) Lexer {
 	lexer.SetRegistry(l)
 	config := lexer.Config()
