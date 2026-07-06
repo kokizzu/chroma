@@ -170,16 +170,20 @@ func (c Colour) Green() uint8 { return uint8(((c - 1) >> 8) & 0xff) } //nolint:g
 // Blue component of colour.
 func (c Colour) Blue() uint8 { return uint8((c - 1) & 0xff) } //nolint:gosec
 
-// Convert colours to #rrggbb.
+// Convert colours to rrggbb, returning "" if the input is not a valid colour.
 func normaliseColour(colour string) string {
 	if ansi, ok := ANSI2RGB[colour]; ok {
 		return ansi
 	}
-	if strings.HasPrefix(colour, "#") {
-		colour = colour[1:]
-		if len(colour) == 3 {
-			return colour[0:1] + colour[0:1] + colour[1:2] + colour[1:2] + colour[2:3] + colour[2:3]
-		}
+	if !strings.HasPrefix(colour, "#") {
+		return ""
 	}
-	return colour
+	colour = colour[1:]
+	switch len(colour) {
+	case 3:
+		return colour[0:1] + colour[0:1] + colour[1:2] + colour[1:2] + colour[2:3] + colour[2:3]
+	case 6:
+		return colour
+	}
+	return ""
 }

@@ -17,6 +17,12 @@ func TestColourString(t *testing.T) {
 	assert.Equal(t, "#8913af", ParseColour("#8913af").String())
 }
 
+func TestParseColourInvalid(t *testing.T) {
+	for _, colour := range []string{"#f00f", "#12", "#1234567", "ff0000", "#zzzzzz", ""} {
+		assert.False(t, ParseColour(colour).IsSet(), "%q should be invalid", colour)
+	}
+}
+
 func distance(a, b uint8) uint8 {
 	if a < b {
 		return b - a
