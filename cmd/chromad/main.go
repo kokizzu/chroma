@@ -18,6 +18,7 @@ import (
 
 	"github.com/alecthomas/chroma/v3"
 	"github.com/alecthomas/chroma/v3/formatters/html"
+	"github.com/alecthomas/chroma/v3/internal/playground"
 	"github.com/alecthomas/chroma/v3/lexers"
 	"github.com/alecthomas/chroma/v3/styles"
 )
@@ -110,45 +111,14 @@ func renderHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func render(req *renderRequest) (*renderResponse, error) {
-	language := lexers.Get(req.Language)
-	if language == nil {
-		language = lexers.Analyse(req.Text)
-		if language != nil {
-			req.Language = language.Config().Name
-		}
-	}
-	if language == nil {
-		language = lexers.Fallback
-	}
-
-	tokens, err := chroma.Coalesce(language).Tokenise(nil, req.Text)
+	res, err := playground.Highlight(req.Text, req.Language, req.Style, req.Classes)
 	if err != nil {
 		return nil, err
-	}
-
-	style := styles.Get(req.Style)
-	if style == nil {
-		style = styles.Fallback
-	}
-
-	buf := &strings.Builder{}
-	options := []html.Option{}
-	if req.Classes {
-		options = append(options, html.WithClasses(true), html.Standalone(true))
-	}
-	formatter := html.New(options...)
-	err = formatter.Format(buf, style, tokens)
-	if err != nil {
-		return nil, err
-	}
-	lang := language.Config().Name
-	if language == lexers.Fallback {
-		lang = ""
 	}
 	return &renderResponse{
-		Language:   lang,
-		HTML:       buf.String(),
-		Background: html.StyleEntryToCSS(style.Get(chroma.Background)),
+		Language:   res.Language,
+		HTML:       res.HTML,
+		Background: res.Background,
 	}, nil
 }
 

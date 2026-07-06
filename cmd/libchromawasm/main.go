@@ -4,13 +4,9 @@
 package main
 
 import (
-	"strings"
 	"syscall/js"
 
-	"github.com/alecthomas/chroma/v3"
-	"github.com/alecthomas/chroma/v3/formatters/html"
-	"github.com/alecthomas/chroma/v3/lexers"
-	"github.com/alecthomas/chroma/v3/styles"
+	"github.com/alecthomas/chroma/v3/internal/playground"
 )
 
 func main() {
@@ -34,44 +30,13 @@ func highlight(this js.Value, args []js.Value) any {
 	styleName := args[2].String()
 	classes := args[3].Bool()
 
-	language := lexers.Get(lexer)
-	if language == nil {
-		language = lexers.Analyse(source)
-		if language != nil {
-			lexer = language.Config().Name
-		}
-	}
-	if language == nil {
-		language = lexers.Fallback
-	}
-
-	tokens, err := chroma.Coalesce(language).Tokenise(nil, source)
+	res, err := playground.Highlight(source, lexer, styleName, classes)
 	if err != nil {
 		panic(err)
-	}
-
-	style := styles.Get(styleName)
-	if style == nil {
-		style = styles.Fallback
-	}
-
-	buf := &strings.Builder{}
-	options := []html.Option{}
-	if classes {
-		options = append(options, html.WithClasses(true), html.Standalone(true))
-	}
-	formatter := html.New(options...)
-	err = formatter.Format(buf, style, tokens)
-	if err != nil {
-		panic(err)
-	}
-	lang := language.Config().Name
-	if language == lexers.Fallback {
-		lang = ""
 	}
 	return js.ValueOf(map[string]any{
-		"html":       buf.String(),
-		"language":   lang,
-		"background": html.StyleEntryToCSS(style.Get(chroma.Background)),
+		"html":       res.HTML,
+		"language":   res.Language,
+		"background": res.Background,
 	})
 }
