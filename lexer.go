@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"fmt"
 	"iter"
+	"path/filepath"
 	"strings"
 )
 
@@ -57,6 +58,17 @@ type Config struct {
 	// otherwise the sum of all the score of matching patterns will be
 	// used as the final score.
 	Analyse *AnalyseConfig `xml:"analyse,omitempty"`
+}
+
+// validateGlobs returns an error if any of the config's filename globs are
+// invalid.
+func (c *Config) validateGlobs() error {
+	for _, glob := range append(c.Filenames, c.AliasFilenames...) {
+		if _, err := filepath.Match(glob, ""); err != nil {
+			return fmt.Errorf("%s: %q is not a valid glob: %w", c.Name, glob, err)
+		}
+	}
+	return nil
 }
 
 // AnalyseConfig defines the list of regexes analysers.

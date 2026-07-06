@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -132,11 +131,8 @@ func NewXMLLexer(from fs.FS, path string) (*RegexLexer, error) {
 		return nil, err
 	}
 
-	for _, glob := range append(config.Filenames, config.AliasFilenames...) {
-		_, err := filepath.Match(glob, "")
-		if err != nil {
-			return nil, fmt.Errorf("%s: %q is not a valid glob: %w", config.Name, glob, err)
-		}
+	if err := config.validateGlobs(); err != nil {
+		return nil, err
 	}
 
 	var analyserFn func(string) float32

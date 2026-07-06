@@ -7,7 +7,6 @@ import (
 	"iter"
 	"maps"
 	"os"
-	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -90,11 +89,8 @@ func NewLexer(config *Config, rulesFunc func() Rules) (*RegexLexer, error) {
 	if config == nil {
 		config = &Config{}
 	}
-	for _, glob := range append(config.Filenames, config.AliasFilenames...) {
-		_, err := filepath.Match(glob, "")
-		if err != nil {
-			return nil, fmt.Errorf("%s: %q is not a valid glob: %w", config.Name, glob, err)
-		}
+	if err := config.validateGlobs(); err != nil {
+		return nil, err
 	}
 	r := &RegexLexer{
 		config:         config,
