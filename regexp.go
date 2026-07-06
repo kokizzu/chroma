@@ -100,35 +100,6 @@ func NewLexer(config *Config, rulesFunc func() Rules) (*RegexLexer, error) {
 		config:         config,
 		fetchRulesFunc: func() (Rules, error) { return rulesFunc(), nil },
 	}
-	// One-off code to generate XML lexers in the Chroma source tree.
-	// var nameCleanRe = regexp.MustCompile(`[^-+A-Za-z0-9_]`)
-	// name := strings.ToLower(nameCleanRe.ReplaceAllString(config.Name, "_"))
-	// data, err := Marshal(r)
-	// if err != nil {
-	// 	if errors.Is(err, ErrNotSerialisable) {
-	// 		fmt.Fprintf(os.Stderr, "warning: %q: %s\n", name, err)
-	// 		return r, nil
-	// 	}
-	// 	return nil, err
-	// }
-	// _, file, _, ok := runtime.Caller(2)
-	// if !ok {
-	// 	panic("??")
-	// }
-	// fmt.Println(file)
-	// if strings.Contains(file, "/lexers/") {
-	// 	dir := filepath.Join(filepath.Dir(file), "embedded")
-	// 	err = os.MkdirAll(dir, 0700)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	filename := filepath.Join(dir, name) + ".xml"
-	// 	fmt.Println(filename)
-	// 	err = ioutil.WriteFile(filename, data, 0600)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 	return r, nil
 }
 
