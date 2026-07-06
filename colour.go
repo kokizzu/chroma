@@ -170,13 +170,6 @@ func (c Colour) Green() uint8 { return uint8(((c - 1) >> 8) & 0xff) } //nolint:g
 // Blue component of colour.
 func (c Colour) Blue() uint8 { return uint8((c - 1) & 0xff) } //nolint:gosec
 
-// Colours is an orderable set of colours.
-type Colours []Colour
-
-func (c Colours) Len() int           { return len(c) }
-func (c Colours) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c Colours) Less(i, j int) bool { return c[i] < c[j] }
-
 // Convert colours to #rrggbb.
 func normaliseColour(colour string) string {
 	if ansi, ok := ANSI2RGB[colour]; ok {
