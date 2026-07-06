@@ -353,16 +353,17 @@ func (r *RegexLexer) maybeCompile() (err error) {
 			}
 		}
 	}
+	// Mutators can't be tracked individually as include splicing duplicates rules.
+	const mutatorLimit = 10000
+	restarts := 0
 restart:
-	seen := map[LexerMutator]bool{}
+	if restarts++; restarts > mutatorLimit {
+		return fmt.Errorf("lexer mutators did not converge after %d iterations; a LexerMutator may have failed to remove itself", mutatorLimit)
+	}
 	for state := range r.rules {
 		for i := range len(r.rules[state]) {
 			rule := r.rules[state][i]
 			if compile, ok := rule.Mutator.(LexerMutator); ok {
-				if seen[compile] {
-					return fmt.Errorf("saw mutator %T twice; this should not happen", compile)
-				}
-				seen[compile] = true
 				if err := compile.MutateLexer(r.rules, state, i); err != nil {
 					return err
 				}
