@@ -174,13 +174,10 @@ func FileTestAnalysis(t *testing.T, lexer chroma.Lexer, actualFilepath, expected
 		expectedData, err := os.ReadFile(expectedFilepath)
 		assert.NoError(t, err)
 
-		analyser, ok := lexer.(chroma.Analyser)
-		assert.True(t, ok, "lexer %q does not set analyser", lexer.Config().Name)
-
 		data, err := os.ReadFile(actualFilepath)
 		assert.NoError(t, err)
 
-		actual := analyser.AnalyseText(string(data))
+		actual := lexer.AnalyseText(string(data))
 		var actualData bytes.Buffer
 		fmt.Fprintf(&actualData, "%s\n", strconv.FormatFloat(float64(actual), 'f', -1, 32))
 

@@ -180,8 +180,3 @@ func compareLexersByPriority(a, b Lexer) int {
 	}
 	return cmp.Compare(bp, ap)
 }
-
-// Analyser determines how appropriate this lexer is for the given text.
-type Analyser interface {
-	AnalyseText(text string) float32
-}

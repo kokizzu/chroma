@@ -169,12 +169,10 @@ func (l *LexerRegistry) Analyse(text string) Lexer {
 	var picked Lexer
 	highest := float32(0.0)
 	for _, lexer := range l.Lexers {
-		if analyser, ok := lexer.(Analyser); ok {
-			weight := analyser.AnalyseText(text)
-			if weight > highest {
-				picked = lexer
-				highest = weight
-			}
+		weight := lexer.AnalyseText(text)
+		if weight > highest {
+			picked = lexer
+			highest = weight
 		}
 	}
 	return picked
