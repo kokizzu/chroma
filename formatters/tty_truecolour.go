@@ -54,16 +54,7 @@ func trueColourFormatter(w io.Writer, style *chroma.Style, it iter.Seq[chroma.To
 			continue
 		}
 
-		formatting := ""
-		if entry.Bold == chroma.Yes {
-			formatting += "\033[1m"
-		}
-		if entry.Underline == chroma.Yes {
-			formatting += "\033[4m"
-		}
-		if entry.Italic == chroma.Yes {
-			formatting += "\033[3m"
-		}
+		formatting := attrEscapeSequence(entry)
 		if entry.Colour.IsSet() {
 			formatting += fmt.Sprintf("\033[38;2;%d;%d;%dm", entry.Colour.Red(), entry.Colour.Green(), entry.Colour.Blue())
 		}

@@ -181,7 +181,9 @@ var ttyTables = map[int]*ttyTable{
 	},
 }
 
-func entryToEscapeSequence(table *ttyTable, entry chroma.StyleEntry) string {
+// attrEscapeSequence returns the SGR escape codes for entry's bold, underline
+// and italic attributes.
+func attrEscapeSequence(entry chroma.StyleEntry) string {
 	out := ""
 	if entry.Bold == chroma.Yes {
 		out += "\033[1m"
@@ -192,6 +194,11 @@ func entryToEscapeSequence(table *ttyTable, entry chroma.StyleEntry) string {
 	if entry.Italic == chroma.Yes {
 		out += "\033[3m"
 	}
+	return out
+}
+
+func entryToEscapeSequence(table *ttyTable, entry chroma.StyleEntry) string {
+	out := attrEscapeSequence(entry)
 	if entry.Colour.IsSet() {
 		out += table.foreground[findClosest(table, entry.Colour)]
 	}
