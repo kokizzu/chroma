@@ -629,10 +629,10 @@ func compressStyle(s string) string {
 	for _, p := range parts {
 		p = strings.Join(strings.Fields(p), " ")
 		p = strings.Replace(p, ": ", ":", 1)
-		if strings.Contains(p, "#") {
-			c := p[len(p)-6:]
+		if i := strings.LastIndexByte(p, '#'); i >= 0 && len(p)-i == 7 {
+			c := p[i+1:]
 			if c[0] == c[1] && c[2] == c[3] && c[4] == c[5] {
-				p = p[:len(p)-6] + c[0:1] + c[2:3] + c[4:5]
+				p = p[:i+1] + c[0:1] + c[2:3] + c[4:5]
 			}
 		}
 		out = append(out, p)
@@ -681,12 +681,7 @@ func (l *styleCache) get(style *chroma.Style, compress bool) map[chroma.TokenTyp
 
 	// No entry, create one.
 	cached := l.f.styleToCSS(style)
-	if !l.f.classes {
-		for t, style := range cached {
-			cached[t] = compressStyle(style)
-		}
-	}
-	if compress {
+	if !l.f.classes || compress {
 		for t, style := range cached {
 			cached[t] = compressStyle(style)
 		}
