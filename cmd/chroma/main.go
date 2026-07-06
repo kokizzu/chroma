@@ -110,7 +110,7 @@ func prepareLenient(r io.Reader, filename string) (string, chroma.Lexer, error) 
 func prepareSpecific(ctx *kong.Context, r io.Reader, filename string, peekSize, fullSize int) (string, chroma.Lexer) {
 	data := make([]byte, peekSize)
 	n, err := io.ReadFull(r, data)
-	if err != nil && !errors.Is(err, io.ErrUnexpectedEOF) {
+	if err != nil && !errors.Is(err, io.ErrUnexpectedEOF) && !errors.Is(err, io.EOF) {
 		ctx.FatalIfErrorf(err)
 	}
 
