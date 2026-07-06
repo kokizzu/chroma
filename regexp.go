@@ -421,7 +421,6 @@ func (r *RegexLexer) fetchRules() error {
 }
 
 func (r *RegexLexer) needRules() error {
-	var err error
 	if r.fetchRulesFunc != nil {
 		r.compileOnce.Do(func() {
 			r.compileError = r.fetchRules()
@@ -430,10 +429,7 @@ func (r *RegexLexer) needRules() error {
 			return r.compileError
 		}
 	}
-	if err := r.maybeCompile(); err != nil {
-		return err
-	}
-	return err
+	return r.maybeCompile()
 }
 
 // Tokenise text using lexer, returning an iterator.
