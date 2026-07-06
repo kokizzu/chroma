@@ -31,23 +31,3 @@ func (f FormatterFunc) Format(w io.Writer, s *Style, it iter.Seq[Token]) (err er
 	}()
 	return f(w, s, it)
 }
-
-type recoveringFormatter struct {
-	Formatter
-}
-
-func (r recoveringFormatter) Format(w io.Writer, s *Style, it iter.Seq[Token]) (err error) {
-	defer func() {
-		if perr := recover(); perr != nil {
-			if e, ok := perr.(error); ok {
-				err = e
-			} else {
-				err = fmt.Errorf("%v", perr)
-			}
-		}
-	}()
-	return r.Formatter.Format(w, s, it)
-}
-
-// RecoveringFormatter wraps a formatter with panic recovery.
-func RecoveringFormatter(formatter Formatter) Formatter { return recoveringFormatter{formatter} }
