@@ -63,9 +63,8 @@ type Formatter struct {
 	fontFormat   FontFormat
 }
 
-func (f *Formatter) Format(w io.Writer, style *chroma.Style, iterator iter.Seq[chroma.Token]) (err error) {
-	f.writeSVG(w, style, slices.Collect(iterator))
-	return err
+func (f *Formatter) Format(w io.Writer, style *chroma.Style, iterator iter.Seq[chroma.Token]) error {
+	return f.writeSVG(w, style, slices.Collect(iterator))
 }
 
 var svgEscaper = strings.NewReplacer(
@@ -82,25 +81,39 @@ func escapeString(s string) string {
 	return svgEscaper.Replace(s)
 }
 
-func (f *Formatter) writeSVG(w io.Writer, style *chroma.Style, tokens []chroma.Token) { // nolint: gocyclo
+func (f *Formatter) writeSVG(w io.Writer, style *chroma.Style, tokens []chroma.Token) error { // nolint: gocyclo
 	svgStyles := f.styleToSVG(style)
 	lines := chroma.SplitTokensIntoLines(tokens)
 
-	fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-	fmt.Fprint(w, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n")
-	fmt.Fprintf(w, "<svg width=\"%dpx\" height=\"%dpx\" xmlns=\"http://www.w3.org/2000/svg\">\n", 8*maxLineWidth(lines), 10+int(16.8*float64(len(lines)+1)))
-
-	if f.embeddedFont != "" {
-		f.writeFontStyle(w)
+	if _, err := fmt.Fprint(w, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+		"<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(w, "<svg width=\"%dpx\" height=\"%dpx\" xmlns=\"http://www.w3.org/2000/svg\">\n", 8*maxLineWidth(lines), 10+int(16.8*float64(len(lines)+1))); err != nil {
+		return err
 	}
 
-	fmt.Fprintf(w, "<rect width=\"100%%\" height=\"100%%\" fill=\"%s\"/>\n", style.Get(chroma.Background).Background.String())
-	fmt.Fprintf(w, "<g font-family=\"%s\" font-size=\"14px\" fill=\"%s\">\n", f.fontFamily, style.Get(chroma.Text).Colour.String())
+	if f.embeddedFont != "" {
+		if err := f.writeFontStyle(w); err != nil {
+			return err
+		}
+	}
 
-	f.writeTokenBackgrounds(w, lines, style)
+	if _, err := fmt.Fprintf(w, "<rect width=\"100%%\" height=\"100%%\" fill=\"%s\"/>\n", style.Get(chroma.Background).Background.String()); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(w, "<g font-family=\"%s\" font-size=\"14px\" fill=\"%s\">\n", f.fontFamily, style.Get(chroma.Text).Colour.String()); err != nil {
+		return err
+	}
+
+	if err := f.writeTokenBackgrounds(w, lines, style); err != nil {
+		return err
+	}
 
 	for index, tokens := range lines {
-		fmt.Fprintf(w, "<text x=\"0\" y=\"%fem\" xml:space=\"preserve\">", 1.2*float64(index+1))
+		if _, err := fmt.Fprintf(w, "<text x=\"0\" y=\"%fem\" xml:space=\"preserve\">", 1.2*float64(index+1)); err != nil {
+			return err
+		}
 
 		for _, token := range tokens {
 			text := escapeString(token.String())
@@ -108,13 +121,17 @@ func (f *Formatter) writeSVG(w io.Writer, style *chroma.Style, tokens []chroma.T
 			if attr != "" {
 				text = fmt.Sprintf("<tspan %s>%s</tspan>", attr, text)
 			}
-			fmt.Fprint(w, text)
+			if _, err := fmt.Fprint(w, text); err != nil {
+				return err
+			}
 		}
-		fmt.Fprint(w, "</text>")
+		if _, err := fmt.Fprint(w, "</text>"); err != nil {
+			return err
+		}
 	}
 
-	fmt.Fprint(w, "\n</g>\n")
-	fmt.Fprint(w, "</svg>\n")
+	_, err := fmt.Fprint(w, "\n</g>\n</svg>\n")
+	return err
 }
 
 func maxLineWidth(lines [][]chroma.Token) int {
@@ -134,18 +151,21 @@ func maxLineWidth(lines [][]chroma.Token) int {
 // There is no background attribute for text in SVG so simply calculate the position and text
 // of tokens with a background color that differs from the default and add a rectangle for each before
 // adding the token.
-func (f *Formatter) writeTokenBackgrounds(w io.Writer, lines [][]chroma.Token, style *chroma.Style) {
+func (f *Formatter) writeTokenBackgrounds(w io.Writer, lines [][]chroma.Token, style *chroma.Style) error {
 	for index, tokens := range lines {
 		lineLength := 0
 		for _, token := range tokens {
 			length := len(strings.ReplaceAll(token.String(), `	`, "    "))
 			tokenBackground := style.Get(token.Type).Background
 			if tokenBackground.IsSet() && tokenBackground != style.Get(chroma.Background).Background {
-				fmt.Fprintf(w, "<rect id=\"%s\" x=\"%dch\" y=\"%fem\" width=\"%dch\" height=\"1.2em\" fill=\"%s\" />\n", escapeString(token.String()), lineLength, 1.2*float64(index)+0.25, length, style.Get(token.Type).Background.String())
+				if _, err := fmt.Fprintf(w, "<rect id=\"%s\" x=\"%dch\" y=\"%fem\" width=\"%dch\" height=\"1.2em\" fill=\"%s\" />\n", escapeString(token.String()), lineLength, 1.2*float64(index)+0.25, length, style.Get(token.Type).Background.String()); err != nil {
+					return err
+				}
 			}
 			lineLength += length
 		}
 	}
+	return nil
 }
 
 type FontFormat int
@@ -164,8 +184,8 @@ var fontFormats = [...]struct{ mime, format string }{
 	{"font/ttf", "truetype"},
 }
 
-func (f *Formatter) writeFontStyle(w io.Writer) {
-	fmt.Fprintf(w, `<style>
+func (f *Formatter) writeFontStyle(w io.Writer) error {
+	_, err := fmt.Fprintf(w, `<style>
 @font-face {
 	font-family: '%s';
 	src: url(data:%s;charset=utf-8;base64,%s) format('%s');
@@ -173,6 +193,7 @@ func (f *Formatter) writeFontStyle(w io.Writer) {
 	font-style: normal;
 }
 </style>`, f.fontFamily, fontFormats[f.fontFormat].mime, f.embeddedFont, fontFormats[f.fontFormat].format)
+	return err
 }
 
 func (f *Formatter) styleToSVG(style *chroma.Style) map[chroma.TokenType]string {

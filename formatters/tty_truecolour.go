@@ -19,10 +19,10 @@ var crOrCrLf = regexp.MustCompile(`\r?\n`)
 //
 // This way, a pager (like https://github.com/walles/moar for example) can show
 // any line in the output by itself, and it will get the right formatting.
-func writeToken(w io.Writer, formatting string, text string) {
+func writeToken(w io.Writer, formatting string, text string) error {
 	if formatting == "" {
-		fmt.Fprint(w, text)
-		return
+		_, err := fmt.Fprint(w, text)
+		return err
 	}
 
 	newlineIndices := crOrCrLf.FindAllStringIndex(text, -1)
@@ -30,19 +30,19 @@ func writeToken(w io.Writer, formatting string, text string) {
 	afterLastNewline := 0
 	for _, indices := range newlineIndices {
 		newlineStart, afterNewline := indices[0], indices[1]
-		fmt.Fprint(w, formatting)
-		fmt.Fprint(w, text[afterLastNewline:newlineStart])
-		fmt.Fprint(w, "\033[0m")
-		fmt.Fprint(w, text[newlineStart:afterNewline])
+		_, err := fmt.Fprint(w, formatting, text[afterLastNewline:newlineStart], "\033[0m", text[newlineStart:afterNewline])
+		if err != nil {
+			return err
+		}
 		afterLastNewline = afterNewline
 	}
 
 	if afterLastNewline < len(text) {
 		// Print whatever is left after the last newline
-		fmt.Fprint(w, formatting)
-		fmt.Fprint(w, text[afterLastNewline:])
-		fmt.Fprint(w, "\033[0m")
+		_, err := fmt.Fprint(w, formatting, text[afterLastNewline:], "\033[0m")
+		return err
 	}
+	return nil
 }
 
 func trueColourFormatter(w io.Writer, style *chroma.Style, it iter.Seq[chroma.Token]) error {
@@ -50,7 +50,9 @@ func trueColourFormatter(w io.Writer, style *chroma.Style, it iter.Seq[chroma.To
 	for token := range it {
 		entry := style.Get(token.Type)
 		if entry.IsZero() {
-			fmt.Fprint(w, token.Value)
+			if _, err := fmt.Fprint(w, token.Value); err != nil {
+				return err
+			}
 			continue
 		}
 
@@ -62,7 +64,9 @@ func trueColourFormatter(w io.Writer, style *chroma.Style, it iter.Seq[chroma.To
 			formatting += fmt.Sprintf("\033[48;2;%d;%d;%dm", entry.Background.Red(), entry.Background.Green(), entry.Background.Blue())
 		}
 
-		writeToken(w, formatting, token.Value)
+		if err := writeToken(w, formatting, token.Value); err != nil {
+			return err
+		}
 	}
 	return nil
 }

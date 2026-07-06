@@ -255,7 +255,9 @@ func (c *indexedTTYFormatter) Format(w io.Writer, style *chroma.Style, it iter.S
 				clr = theme[chroma.Background]
 			}
 		}
-		writeToken(w, clr, token.Value)
+		if err := writeToken(w, clr, token.Value); err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -21,7 +21,7 @@ func TestWriteFontStyle(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			f := New(EmbedFont("Test", "AAAA", test.format))
 			w := &strings.Builder{}
-			f.writeFontStyle(w)
+			assert.NoError(t, f.writeFontStyle(w))
 			assert.Contains(t, w.String(), test.expected)
 		})
 	}
