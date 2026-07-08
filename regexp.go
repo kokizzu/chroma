@@ -191,7 +191,10 @@ func (l *LexerState) drainIteratorStack(yield func(Token) bool) bool {
 func (l *LexerState) Iterator() iter.Seq[Token] { // nolint: gocognit
 	return func(yield func(Token) bool) {
 		defer l.stopIterators()
-		trace := json.NewEncoder(os.Stderr)
+		var trace *json.Encoder
+		if l.Lexer.trace {
+			trace = json.NewEncoder(os.Stderr)
+		}
 		end := len(l.Text)
 		if l.newlineAdded {
 			end--

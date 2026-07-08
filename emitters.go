@@ -57,7 +57,6 @@ func (b *byGroupsEmitter) Emit(groups []string, state *LexerState) iter.Seq[Toke
 	iterators := make([]iter.Seq[Token], 0, len(groups)-1)
 	if len(b.Emitters) != len(groups)-1 {
 		iterators = append(iterators, Error.Emit(groups, state))
-		// panic(errors.Errorf("number of groups %q does not match number of emitters %v", groups, emitters))
 	} else {
 		for i, group := range groups[1:] {
 			if b.Emitters[i] != nil {
