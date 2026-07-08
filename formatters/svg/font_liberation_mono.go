@@ -50,6 +50,7 @@ package svg
 import (
 	_ "embed"
 	"encoding/base64"
+	"sync"
 )
 
 //go:embed liberation_mono.woff
@@ -57,4 +58,4 @@ var fontLiberationMonoWOFF []byte
 
 // FontLiberationMono is the Liberation Mono font, base64-encoded, suitable
 // for passing to EmbedFont with the WOFF format.
-func FontLiberationMono() string { return base64.StdEncoding.EncodeToString(fontLiberationMonoWOFF) }
+var FontLiberationMono = sync.OnceValue(func() string { return base64.StdEncoding.EncodeToString(fontLiberationMonoWOFF) })
