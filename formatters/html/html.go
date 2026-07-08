@@ -37,7 +37,8 @@ func WithCustomCSS(css map[chroma.TokenType]string) Option {
 	}
 }
 
-// WithCSSComments adds prefixe comments to the css classes. Defaults to true.
+// WithCSSComments prefixes each generated CSS rule with a comment naming its
+// token type. Defaults to true.
 func WithCSSComments(b bool) Option { return func(f *Formatter) { f.writeCSSComments = b } }
 
 // TabWidth sets the number of characters for a tab. Defaults to 8.
@@ -122,9 +123,11 @@ func WithLinkableLineNumbers(b bool, prefix string) Option {
 	}
 }
 
-// HighlightLines higlights the given line ranges with the Highlight style.
+// HighlightLines highlights the given line ranges with the Highlight style.
 //
-// A range is the beginning and ending of a range as 1-based line numbers, inclusive.
+// A range is the beginning and ending of a range as 1-based line numbers,
+// inclusive. Ranges are matched against displayed line numbers, so they
+// follow BaseLineNumber.
 func HighlightLines(ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.highlightRanges = ranges
@@ -134,7 +137,9 @@ func HighlightLines(ranges [][2]int) Option {
 
 // WithLinePrompts adds a non-selectable prompt before each line in the given ranges.
 //
-// A range is the beginning and ending of a range as 1-based line numbers, inclusive.
+// A range is the beginning and ending of a range as 1-based line numbers,
+// inclusive. Ranges are matched against displayed line numbers, so they
+// follow BaseLineNumber.
 func WithLinePrompts(prompt string, ranges [][2]int) Option {
 	return func(f *Formatter) {
 		f.linePrompt = prompt

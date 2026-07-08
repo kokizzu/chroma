@@ -462,7 +462,7 @@ func (s *Style) synthesise(ttype TokenType) StyleEntry {
 	case LineHighlight:
 		return StyleEntry{Background: bg.Background.BrightenOrDarken(0.1)}
 
-	// If we don't have line numbers, use the text colour but 20% brighter/darker
+	// If we don't have line numbers, derive a colour from the background, 50% brighter/darker.
 	case LineNumbers, LineNumbersTable:
 		return text
 
