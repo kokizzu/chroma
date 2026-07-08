@@ -237,7 +237,9 @@ func main() {
 			if name == "" {
 				name = "-"
 			}
-			check(name, lex(ctx, lexer, contents))
+			if check(name, lex(ctx, lexer, contents)) {
+				ctx.Exit(1)
+			}
 			return
 		}
 		if cli.Fail {
@@ -248,6 +250,7 @@ func main() {
 		}
 		format(ctx, w, style, lex(ctx, lexer, contents))
 	} else {
+		checkFailed := false
 		for _, filename := range cli.Files {
 			file, err := os.Open(filename)
 			ctx.FatalIfErrorf(err)
@@ -255,7 +258,9 @@ func main() {
 			if cli.Check {
 				contents, lexer, err := prepareLenient(file, filename)
 				ctx.FatalIfErrorf(err)
-				check(filename, lex(ctx, lexer, contents))
+				if check(filename, lex(ctx, lexer, contents)) {
+					checkFailed = true
+				}
 			} else {
 				var contents string
 				var lexer chroma.Lexer
@@ -272,6 +277,9 @@ func main() {
 
 			err = file.Close()
 			ctx.FatalIfErrorf(err)
+		}
+		if checkFailed {
+			ctx.Exit(1)
 		}
 	}
 }
@@ -406,10 +414,13 @@ func format(ctx *kong.Context, w io.Writer, style *chroma.Style, it iter.Seq[chr
 	ctx.FatalIfErrorf(err)
 }
 
-func check(filename string, it iter.Seq[chroma.Token]) {
+// check reports tokenisation errors, returning true if any were found.
+func check(filename string, it iter.Seq[chroma.Token]) bool {
+	failed := false
 	line, col := 1, 0
 	for token := range it {
 		if token.Type == chroma.Error {
+			failed = true
 			fmt.Printf("%s:%d:%d %q\n", filename, line, col, token.String())
 		}
 		for _, c := range token.String() {
@@ -419,6 +430,7 @@ func check(filename string, it iter.Seq[chroma.Token]) {
 			}
 		}
 	}
+	return failed
 }
 
 var nameCleanRe = regexp.MustCompile(`[^A-Za-z0-9_#+-]`)
