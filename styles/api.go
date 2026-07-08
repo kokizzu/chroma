@@ -86,7 +86,7 @@ func GetForMode(name string, mode chroma.Mode) *chroma.Style {
 	if style.Counterpart == "" {
 		return style
 	}
-	counterpart, ok := registry[style.Counterpart]
+	counterpart, ok := Lookup(style.Counterpart)
 	if !ok || counterpart.Mode() != mode {
 		return style
 	}

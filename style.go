@@ -313,7 +313,7 @@ func (s *Style) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "style"}
 	start.Attr = []xml.Attr{{Name: xml.Name{Local: "name"}, Value: s.Name}}
 	if s.Counterpart != "" {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "counterpart"}, Value: s.Counterpart})
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "counterpart"}, Value: strings.ToLower(s.Counterpart)})
 	}
 	if err := e.EncodeToken(start); err != nil {
 		return err
