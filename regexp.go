@@ -26,6 +26,7 @@ type Rule struct {
 
 // Words creates a regex that matches any of the given literal words.
 func Words(prefix, suffix string, words ...string) string {
+	words = slices.Clone(words)
 	slices.SortFunc(words, func(a, b string) int {
 		return cmp.Compare(len(b), len(a))
 	})
