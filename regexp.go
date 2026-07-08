@@ -209,7 +209,11 @@ func (l *LexerState) Iterator() iter.Seq[Token] { // nolint: gocognit
 			if l.Lexer.trace {
 				start = time.Now()
 			}
-			ruleIndex, rule, groups, namedGroups := matchRules(l.Text, l.Pos, selectedRule)
+			ruleIndex, rule, groups, namedGroups, err := matchRules(l.Text, l.Pos, selectedRule)
+			if err != nil {
+				// The iterator cannot return an error, so panic and let the Formatter recover it.
+				panic(fmt.Errorf("%s: state %s: %w", l.Lexer.config.Name, l.State, err))
+			}
 			if l.Lexer.trace {
 				var length int
 				if groups != nil {
@@ -481,20 +485,23 @@ func (r *RegexLexer) MustRules() Rules {
 	return rules
 }
 
-func matchRules(text []rune, pos int, rules []*CompiledRule) (int, *CompiledRule, []string, map[string]string) {
+func matchRules(text []rune, pos int, rules []*CompiledRule) (int, *CompiledRule, []string, map[string]string, error) {
 	for i, rule := range rules {
 		match, err := rule.Regexp.FindRunesMatchStartingAt(text, pos)
-		if match != nil && err == nil && match.RuneIndex == pos {
+		if err != nil {
+			return 0, nil, nil, nil, fmt.Errorf("matching %q: %w", rule.Pattern, err)
+		}
+		if match != nil && match.RuneIndex == pos {
 			groups := []string{}
 			namedGroups := make(map[string]string)
 			for _, g := range match.Groups() {
 				namedGroups[g.Name] = g.String()
 				groups = append(groups, g.String())
 			}
-			return i, rule, groups, namedGroups
+			return i, rule, groups, namedGroups, nil
 		}
 	}
-	return 0, &CompiledRule{}, nil, nil
+	return 0, &CompiledRule{}, nil, nil, nil
 }
 
 // replace \r and \r\n with \n
