@@ -153,7 +153,9 @@ func (p *pushMutator) Mutate(s *LexerState) error {
 	} else {
 		for _, state := range p.States {
 			if state == "#pop" {
-				s.Stack = s.Stack[:len(s.Stack)-1]
+				if len(s.Stack) > 0 {
+					s.Stack = s.Stack[:len(s.Stack)-1]
+				}
 			} else {
 				s.Stack = append(s.Stack, state)
 			}
@@ -177,7 +179,7 @@ func (p *popMutator) Mutate(state *LexerState) error {
 	if len(state.Stack) == 0 {
 		return fmt.Errorf("nothing to pop")
 	}
-	state.Stack = state.Stack[:len(state.Stack)-p.Depth]
+	state.Stack = state.Stack[:len(state.Stack)-min(p.Depth, len(state.Stack))]
 	return nil
 }
 
