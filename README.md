@@ -194,6 +194,13 @@ following constructor options:
 - `HighlightLines(ranges)` - Highlight lines in these ranges (style with `LineHighlight`).
 - `WithLinePrompts(prompt, ranges)` - Render non-selectable prompts before lines in these ranges.
 - `LineNumbersInTable()` - Use a table for formatting line numbers and code, rather than spans.
+- `BaseLineNumber(n)` - Set the first line number; highlight and prompt ranges follow it.
+- `WrapLongLines(true)` - Wrap long lines instead of scrolling.
+- `PreventSurroundingPre(true)` - Emit the highlighted spans without the surrounding `<pre>`.
+- `InlineCode(true)` - Generate output suitable for inline `<code>` elements.
+- `WithPreWrapper(wrapper)` - Customise the wrapping `<pre>` element.
+- `WithCustomCSS(css)` - Add custom CSS per token type.
+- `WithModeClasses(true)` - Scope generated CSS by the style's light/dark mode class.
 
 If `WithClasses()` is used, the corresponding CSS can be obtained from the formatter with:
 
@@ -201,6 +208,11 @@ If `WithClasses()` is used, the corresponding CSS can be obtained from the forma
 formatter := html.New(html.WithClasses(true))
 err := formatter.WriteCSS(w, style)
 ```
+
+For light/dark theme switching, enable `WithModeClasses(true)` and write the
+CSS for both styles into one stylesheet. Each rule is scoped by its style's
+mode class (eg. `.chroma.dark`), so the theme can be toggled at runtime by
+swapping the mode class on the wrapper element.
 
 ## More detail
 
