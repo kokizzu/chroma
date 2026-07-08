@@ -7,6 +7,12 @@ func Coalesce(lexer Lexer) Lexer { return &coalescer{lexer} }
 
 type coalescer struct{ Lexer }
 
+func (d *coalescer) SetTracing(enable bool) {
+	if l, ok := d.Lexer.(TracingLexer); ok {
+		l.SetTracing(enable)
+	}
+}
+
 func (d *coalescer) Tokenise(options *TokeniseOptions, text string) (iter.Seq[Token], error) {
 	it, err := d.Lexer.Tokenise(options, text)
 	if err != nil {
