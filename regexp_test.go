@@ -54,6 +54,17 @@ func TestMatchingAtStart(t *testing.T) {
 		slices.Collect(it))
 }
 
+func TestZeroWidthMatchTerminates(t *testing.T) {
+	l := Coalesce(mustNewLexer(t, &Config{}, Rules{ // nolint: forbidigo
+		"root": {
+			{`a*`, Text, nil},
+		},
+	}))
+	it, err := l.Tokenise(nil, "b")
+	assert.NoError(t, err)
+	assert.Equal(t, []Token{{Error, "b"}}, slices.Collect(it))
+}
+
 func TestEnsureLFOption(t *testing.T) {
 	l := Coalesce(mustNewLexer(t, &Config{}, Rules{ // nolint: forbidigo
 		"root": {

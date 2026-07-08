@@ -249,13 +249,23 @@ func (l *LexerState) Iterator() iter.Seq[Token] { // nolint: gocognit
 			l.Groups = groups
 			l.NamedGroups = namedGroups
 			l.Pos += utf8.RuneCountInString(groups[0])
+			progressed := groups[0] != ""
 			if rule.Mutator != nil {
+				depth, top := len(l.Stack), l.State
 				if err := rule.Mutator.Mutate(l); err != nil {
 					panic(err)
 				}
+				progressed = progressed || len(l.Stack) != depth || len(l.Stack) == 0 || l.Stack[len(l.Stack)-1] != top
 			}
 			if rule.Type != nil {
 				l.pushIterator(rule.Type.Emit(l.Groups, l))
+			}
+			if !progressed {
+				// A zero-width match that did not change state will never advance.
+				l.Pos++
+				if !yield(Token{Error, string(l.Text[l.Pos-1 : l.Pos])}) {
+					return
+				}
 			}
 		}
 		if !l.drainIteratorStack(yield) {
