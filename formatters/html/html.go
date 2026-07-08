@@ -329,7 +329,7 @@ func (f *Formatter) writeHTML(w io.Writer, style *chroma.Style, tokens []chroma.
 			if highlight {
 				// Line + LineHighlight
 				if f.classes {
-					fmt.Fprintf(w, ` class="%s %s"`, f.class(chroma.Line), f.class(chroma.LineHighlight))
+					fmt.Fprintf(w, ` class="%s %s"`, html.EscapeString(f.class(chroma.Line)), html.EscapeString(f.class(chroma.LineHighlight)))
 				} else {
 					fmt.Fprintf(w, ` style="%s %s"`, css[chroma.Line], css[chroma.LineHighlight])
 				}
@@ -395,7 +395,7 @@ func (f *Formatter) lineTitleWithLinkIfNeeded(css map[chroma.TokenType]string, l
 }
 
 func (f *Formatter) lineID(line int) string {
-	return fmt.Sprintf("%s%d", f.lineNumbersIDPrefix, line)
+	return html.EscapeString(fmt.Sprintf("%s%d", f.lineNumbersIDPrefix, line))
 }
 
 func (f *Formatter) class(t chroma.TokenType) string {
@@ -420,7 +420,7 @@ func (f *Formatter) styleAttr(styles map[chroma.TokenType]string, tt chroma.Toke
 		if cls == "" {
 			return ""
 		}
-		return fmt.Sprintf(` class="%s"`, cls)
+		return fmt.Sprintf(` class="%s"`, html.EscapeString(cls))
 	}
 	style, ok := chroma.Lookup(styles, tt)
 	if !ok {
@@ -448,7 +448,7 @@ func (f *Formatter) styleAttrWithMode(styles map[chroma.TokenType]string, tt chr
 	if cls == "" {
 		return ""
 	}
-	return fmt.Sprintf(` class="%s %s"`, cls, f.modeClass(style))
+	return fmt.Sprintf(` class="%s %s"`, html.EscapeString(cls), html.EscapeString(f.modeClass(style)))
 }
 
 func (f *Formatter) tabWidthStyle() string {
